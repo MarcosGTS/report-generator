@@ -1,0 +1,140 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Alinha no topo */
+    min-height: 100vh;
+    margin: 20px;
+    color: #333;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 900px;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #0056b3;
+    margin-bottom: 25px;
+}
+
+.input-section, .table-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+input[type="file"] {
+    display: block;
+    width: calc(100% - 22px); /* Ajuste para o padding */
+    padding: 10px;
+    margin: 0 auto 15px auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin: 5px; /* Adiciona um pouco de margem entre os botões */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.table-wrapper {
+    max-height: 400px; /* Limita a altura da tabela para scroll */
+    overflow-y: auto; /* Adiciona scroll vertical se o conteúdo for muito grande */
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #fff;
+}
+
+table th, table td {
+    border: 1px solid #e0e0e0;
+    padding: 10px 12px;
+    text-align: left;
+    white-space: nowrap; /* Evita que o texto quebre em várias linhas */
+}
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #444;
+    position: sticky; /* Fixa o cabeçalho ao rolar */
+    top: 0;
+    z-index: 1; /* Garante que o cabeçalho fique acima do conteúdo */
+}
+
+.message-area {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #ffe0b2;
+    color: #e65100;
+    font-weight: bold;
+    display: none; /* Escondido por padrão */
+}
+
+.message-area.show {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+.date-filter-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas menores */
+    justify-content: center; /* Centraliza os itens */
+    align-items: center;
+    gap: 15px; /* Espaço entre os itens */
+}
+
+.date-filter-section label {
+    margin-bottom: 0; /* Ajusta a margem do label dentro da seção */
+    flex-basis: 100px; /* Largura mínima para o label */
+    text-align: right;
+}
+
+.date-filter-section input[type="date"] {
+    width: 180px; /* Largura para os campos de data */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

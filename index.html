@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor de Planilhas e Gerador de PDF</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Leitor de Planilhas e Gerador de PDF</h1>
+
+        <div class="input-section">
+            <label for="excelFile">Selecione o arquivo Excel:</label>
+            <input type="file" id="excelFile" accept=".xls,.xlsx">
+            <button id="readButton">Ler Planilha</button>
+
+            <div class="date-filter-section">
+                <label for="startDate">Data de Início:</label>
+                <input type="date" id="startDate">
+                
+                <label for="endDate">Data de Fim:</label>
+                <input type="date" id="endDate">
+                
+                <button id="applyFilterButton">Aplicar Filtro</button>
+            </div>
+            </div>
+
+        <div class="table-section hidden" id="tableSection">
+            <h2>Dados da Planilha:</h2>
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+            <button id="generatePdfButton">Gerar PDF</button>
+        </div>
+
+        <div class="message-area" id="messageArea"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
