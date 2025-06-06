@@ -192,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const dateColIndex = headers.findIndex(h => h && typeof h === 'string' && h.toLowerCase().includes('carimbo de data/hora'));
         const photoColIndex = headers.findIndex(h => h && typeof h === 'string' && h.toLowerCase().includes('foto'));
+        const authorColIndex= headers.findIndex(h => h && typeof h === 'string' && h.toLowerCase().includes('nome completo'));
+        const sectorColIndex = headers.findIndex(h => h && typeof h === 'string' && h.toLowerCase().includes('setor'));
         const descriptionColIndex = headers.findIndex(h => h && typeof h === 'string' && h.toLowerCase().includes('descrição'));
 
         if (dateColIndex === -1 || photoColIndex === -1 || descriptionColIndex === -1) {
@@ -212,15 +214,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Relátorio de Inspeção UMB', margin, yOffset);
+        yOffset += 2*lineHeight;
+
         for (const row of dataRows) {
             // const date = String(row[dateColIndex] || 'N/A');
-            const date = formatarDataDDMMYYYY(row[dateColIndex]);
-            const photosString = String(row[photoColIndex] || '');
+            const date = formatarDataHoraCompleta(row[dateColIndex]);
+            const photosString = String(row[photoColIndex] || 'Não Informado');
+            const author = String(row[authorColIndex] || 'Não Informado');
+            const sector = String(row[sectorColIndex] || 'Não Informado');
             const description = String(row[descriptionColIndex] || 'N/A');
 
             checkPageBreak(lineHeight);
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
+            doc.text(`Autor: ${author}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Setor: ${sector}`, margin, yOffset);
+            yOffset += lineHeight;
             doc.text(`Data/Hora: ${date}`, margin, yOffset);
             yOffset += lineHeight;
 
@@ -241,12 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 yOffset += lineHeight + 2;
 
                 for (const url of photoUrls) {
-                    const processedUrl = getGoogleDriveThumbnailUrl(url, 800); 
+                    const processedUrl = getGoogleDriveThumbnailUrl(url, 1000); 
                     try {
                         const { dataUrl, width, height } = await loadImage(processedUrl);
 
-                        let imgDisplayWidth = imageMaxWidth;
-                        let imgDisplayHeight = (height * imgDisplayWidth) / width;
+                        // let imgDisplayWidth = imageMaxWidth;
+                        // let imgDisplayHeight = (height * imgDisplayWidth) / width;
+
+                        let imgDisplayWidth = 150;
+                        let imgDisplayHeight = 100; 
 
                         if (imgDisplayHeight > (maxPageHeight - yOffset - 5)) {
                             imgDisplayHeight = maxPageHeight - yOffset - 5;
@@ -256,6 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         checkPageBreak(imgDisplayHeight + 5);
                         const imgX = margin + (imageMaxWidth - imgDisplayWidth) / 2;
                         doc.addImage(dataUrl, 'JPEG', imgX, yOffset, imgDisplayWidth, imgDisplayHeight);
+
+                        doc.link(imgX, yOffset, imgDisplayWidth, imgDisplayHeight, {
+                            url: processedUrl // link destination
+                        });
+
                         yOffset += imgDisplayHeight + 5;
 
                     } catch (error) {
@@ -296,36 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Função para renderizar a tabela, agora recebe os dados a serem exibidos
-    // function renderTable(dataToRender) {
-    //     const thead = dataTable.querySelector('thead');
-    //     const tbody = dataTable.querySelector('tbody');
-
-    //     thead.innerHTML = '';
-    //     tbody.innerHTML = '';
-
-    //     if (dataToRender.length > 0) {
-    //         const headerRow = document.createElement('tr');
-    //         dataToRender[0].forEach(headerText => {
-    //             const th = document.createElement('th');
-    //             th.textContent = headerText;
-    //             headerRow.appendChild(th);
-    //         });
-    //         thead.appendChild(headerRow);
-
-    //         for (let i = 1; i < dataToRender.length; i++) {
-    //             const rowData = dataToRender[i];
-    //             const tr = document.createElement('tr');
-    //             rowData.forEach(cellData => {
-    //                 const td = document.createElement('td');
-    //                 td.textContent = cellData;
-    //                 tr.appendChild(td);
-    //             });
-    //             tbody.appendChild(tr);
-    //         }
-    //     }
-    // }
-
-    // Função para renderizar a tabela, agora recebe os dados a serem exibidos
     function renderTable(dataToRender) {
         const thead = dataTable.querySelector('thead');
         const tbody = dataTable.querySelector('tbody');
@@ -351,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const td = document.createElement('td');
                     if (colIndex === dateColIndex) {
                         // --- AQUI A DATA É FORMATADA PARA A TABELA HTML ---
-                        td.textContent = formatarDataDDMMYYYY(cellData);
+                        td.textContent = formatarDataHoraCompleta(cellData);
                         // --- FIM DA FORMATAÇÃO ---
                     } else {
                         td.textContent = cellData;
@@ -388,29 +382,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
 
-    function formatarDataDDMMYYYY(dataRaw) {
+    function formatarDataHoraCompleta(dataRaw) {
         if (!dataRaw) return 'N/A';
 
         let dataObj;
-        // Tenta parsear a data. O XLSX.read pode retornar datas como números ou strings.
+
+        // Attempt to parse the date. XLSX.read can return dates as numbers or strings.
         if (typeof dataRaw === 'number') {
-            // Se for número, assume que é formato de data do Excel
-            const excelDate = XLSX.SSF.parse_date_code(dataRaw);
-            dataObj = new Date(excelDate.y, excelDate.m - 1, excelDate.d, excelDate.H, excelDate.M, excelDate.S);
+            // If it's a number, assume it's an Excel date format
+            // Note: For XLSX.SSF.parse_date_code to work, you'd typically need the XLSX library
+            // loaded in your environment. If you're not using XLSX, this part might need adjustment
+            // or removal if your numbers are standard Unix timestamps (milliseconds since epoch).
+            try {
+                // This line assumes XLSX.SSF is available globally.
+                // If not, and 'dataRaw' is a Unix timestamp (milliseconds), use:
+                // dataObj = new Date(dataRaw);
+                const excelDate = XLSX.SSF.parse_date_code(dataRaw);
+                dataObj = new Date(excelDate.y, excelDate.m - 1, excelDate.d, excelDate.H, excelDate.M, excelDate.S);
+            } catch (e) {
+                // Fallback for when XLSX.SSF is not available or it's a standard timestamp
+                dataObj = new Date(dataRaw);
+            }
         } else {
-            // Se for string, tenta criar um objeto Date diretamente
+            // If it's a string, try to create a Date object directly
             dataObj = new Date(dataRaw);
         }
 
-        // Verifica se a data é válida
+        // Check if the date is valid
         if (isNaN(dataObj.getTime())) {
-            return String(dataRaw); // Retorna o valor original se não for uma data válida
+            return String(dataRaw); // Return the original value if it's not a valid date
         }
 
         const dia = String(dataObj.getDate()).padStart(2, '0');
-        const mes = String(dataObj.getMonth() + 1).padStart(2, '0'); // Mês é de 0 a 11
+        const mes = String(dataObj.getMonth() + 1).padStart(2, '0'); // Month is 0-11
         const ano = dataObj.getFullYear();
+        const hora = String(dataObj.getHours()).padStart(2, '0');
+        const minuto = String(dataObj.getMinutes()).padStart(2, '0');
+        const segundo = String(dataObj.getSeconds()).padStart(2, '0');
 
-        return `${dia}/${mes}/${ano}`;
+        return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
     }
 });
